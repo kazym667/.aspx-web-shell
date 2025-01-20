@@ -11,12 +11,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>kazym667</title>
+    <title>Pentester's Toolkit</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-dark text-light">
     <div class="container py-5">
-        <h1 class="text-center mb-4">kazym667</h1>
+        <h1 class="text-center mb-4">Pentester's Toolkit</h1>
         <div class="card bg-secondary text-light">
             <div class="card-body">
                 <form runat="server">
